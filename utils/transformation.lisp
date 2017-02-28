@@ -40,4 +40,13 @@ of characters."
 (element by element)."
   (map 'list #'xor-ascii-list-with-code ascii-lists vector))
 
+(defun xor-ascii-vector-with-list (ascii-vector list)
+  "Find xor of ASCII-VECTOR and LIST(element by element).
+If LIST contains null elements then return zero."
+  (map 'list #'(lambda (x y)
+                 (if (not (null y))
+                     (logxor x y)
+                     0))
+       ascii-vector list))
+
 ;;; IMPLEMENTATION
