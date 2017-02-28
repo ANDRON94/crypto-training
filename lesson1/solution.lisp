@@ -31,15 +31,14 @@ More frequency - more weight."
         ((punctuationp code) (- *pivot-weight* 2))
         (t 0)))
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun column-weight (ascii-vectors column-id column-key)
-    "Calculate a weight of characters belong to column
+(defun column-weight (ascii-vectors column-id column-key)
+  "Calculate a weight of characters belong to column
 with COLUMN-ID from ASCII-VECTORS. Character is a xor
 of COLUMN-KEY and corresponding ascii value."
-    (loop :for vector :across ascii-vectors
-       :for code = (aref vector column-id)
-       :for letter = (logxor code column-key)
-       :sum (char-weight letter))))
+  (loop :for vector :across ascii-vectors
+     :for code = (aref vector column-id)
+     :for letter = (logxor code column-key)
+     :sum (char-weight letter)))
 
 ;;; INTERFACE
 
