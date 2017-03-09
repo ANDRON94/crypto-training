@@ -11,7 +11,9 @@
                         :serial nil
                         :components
                         ((:file "general")
-                         (:file "transformation" :depends-on("general"))))
+                         (:file "helper-data")
+                         (:file "transformation")
+                         (:file "special" :depends-on("helper-data"))))
                (:module "lesson1"
                         :serial nil
                         :components

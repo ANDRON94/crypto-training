@@ -17,6 +17,8 @@ of ASCII codes."
        :finally (return result))))
 
 (defun hex-strings->ascii-vectors (messages)
+  "Convert several hex strings to a several vectors
+of ASCII codes."
   (map 'vector #'hex-string->ascii-vector messages))
 
 (defun ascii-vector->char-vector (ascii-vector)
@@ -30,23 +32,14 @@ of characters."
   (map 'vector #'(lambda (x y) (logxor x y))
        vector1 vector2))
 
-(defun xor-ascii-list-with-code (ascii-list code)
-  "Find xor of each element from ASCII-LIST with CODE."
-  (mapcar #'(lambda (ascii-code) (logxor ascii-code code))
-          ascii-list))
+(defun xor-ascii-vector-with-code (ascii-vector code)
+  "Find xor of each element from ASCII-VECTOR with CODE."
+  (map 'vector #'(lambda (ascii-code) (logxor ascii-code code))
+       ascii-vector))
 
-(defun xor-ascii-lists-with-vector (ascii-lists vector)
-  "Find xor of each list from ASCII-LISTS with VECTOR
-(element by element)."
-  (map 'list #'xor-ascii-list-with-code ascii-lists vector))
-
-(defun xor-ascii-vector-with-list (ascii-vector list)
-  "Find xor of ASCII-VECTOR and LIST(element by element).
-If LIST contains null elements then return zero."
-  (map 'list #'(lambda (x y)
-                 (if (not (null y))
-                     (logxor x y)
-                     0))
-       ascii-vector list))
+(defun xor-ascii-vectors-with-codes (ascii-vectors codes)
+  "Find xor of each vector from ASCII-VECTORS with each code
+from CODES."
+  (map 'vector #'xor-ascii-vector-with-code ascii-vectors codes))
 
 ;;; IMPLEMENTATION

@@ -5,5 +5,26 @@
 
 (defpackage #:learn-crypto-bitch
   (:use #:cl)
-  ;; (:export )
-  )
+  (:export ;; Utils
+           ;; general
+           #:find-comparisons
+           #:visit-all-permutations
+           ;; helper-data
+           #:english-letters
+           #:digits
+           #:*english-letters*
+           #:*digits*
+           #:*punctuation-signs*
+           #:*alphabet*
+           ;; transformation
+           #:hex-string->ascii-vector
+           #:hex-strings->ascii-vectors
+           #:ascii-vector->char-vector
+           #:xor-ascii-vectors
+           #:xor-ascii-vector-with-code
+           #:xor-ascii-vectors-with-codes
+           ;; special
+           #:decompose-xored-letter
+           #:decompose-xor-comparison
+           #:decompose-xor-comparisons
+           ))
