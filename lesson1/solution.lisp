@@ -9,10 +9,9 @@
   "Find all possible key variants for each ascii code
 from ASCII-VECTORS compare to vector with PIVOT-ID index."
   (let ((pivot-vector (aref ascii-vectors pivot-id))
-        (comparisons (find-comparisons #'xor-ascii-vectors
-                                       ascii-vectors pivot-id)))
-    (xor-ascii-vectors-with-codes (decompose-xor-comparisons comparisons)
-                                  pivot-vector)))
+        (comparisons (find-comparisons #'xor-vectors ascii-vectors pivot-id)))
+    (xor-vectors-with-vector (decompose-xor-comparisons comparisons)
+                             pivot-vector)))
 
 (defun brute-force-attack (ascii-vectors)
   "Find all possible key variants for ASCII-VECTORS(use a first vector
@@ -98,7 +97,7 @@ of COLUMN-KEY and corresponding ascii value."
 (defun print-message-variant (ascii-vector key)
   "Print KEY and message(xor of ASCII-VECTOR and KEY
 element by element)."
-  (let ((msg (ascii-vector->char-vector (xor-ascii-vectors ascii-vector key))))
+  (let ((msg (ascii-vector->char-vector (xor-vectors ascii-vector key))))
     (format t "Keys: ~a~%" key)
     (format t "Message: ~a~%~%" msg)
     msg))

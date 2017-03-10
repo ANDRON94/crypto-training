@@ -27,19 +27,19 @@ of characters."
   (map 'vector #'(lambda (ascii) (code-char ascii))
        ascii-vector))
 
-(defun xor-ascii-vectors (vector1 vector2)
+(defun xor-vectors (vector1 vector2)
   "Find xor of two vectors(element by element)."
   (map 'vector #'(lambda (x y) (logxor x y))
        vector1 vector2))
 
-(defun xor-ascii-vector-with-code (ascii-vector code)
-  "Find xor of each element from ASCII-VECTOR with CODE."
-  (map 'vector #'(lambda (ascii-code) (logxor ascii-code code))
-       ascii-vector))
+(defun xor-vector-with-scalar (vector scalar)
+  "Find xor of each element from VECTOR with SCALAR(integer number)."
+  (map 'vector #'(lambda (curr-elem) (logxor curr-elem scalar))
+       vector))
 
-(defun xor-ascii-vectors-with-codes (ascii-vectors codes)
-  "Find xor of each vector from ASCII-VECTORS with each code
-from CODES."
-  (map 'vector #'xor-ascii-vector-with-code ascii-vectors codes))
+(defun xor-vectors-with-vector (vectors vector)
+  "Find xor of each vector from VECTORS with each scalar
+value from VECTOR."
+  (map 'vector #'xor-vector-with-scalar vectors vector))
 
 ;;; IMPLEMENTATION

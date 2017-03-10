@@ -20,9 +20,9 @@
            #:hex-string->ascii-vector
            #:hex-strings->ascii-vectors
            #:ascii-vector->char-vector
-           #:xor-ascii-vectors
-           #:xor-ascii-vector-with-code
-           #:xor-ascii-vectors-with-codes
+           #:xor-vectors
+           #:xor-vector-with-scalar
+           #:xor-vectors-with-vector
            ;; special
            #:decompose-xored-letter
            #:decompose-xor-comparison
