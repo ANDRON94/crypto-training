@@ -27,4 +27,8 @@
            #:decompose-xored-letter
            #:decompose-xor-comparison
            #:decompose-xor-comparisons
+           ;; Lesson1
+           ;; TODO: think!
+           ;; Lesson2
+           ;; TODO: think!
            ))
