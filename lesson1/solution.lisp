@@ -103,10 +103,12 @@ element by element)."
     msg))
 
 (defun print-all-message-variants (ascii-vector key-variants)
+  "Print all possible permutations of KEY-VARIANTS and
+corresponding message."
   (visit-all-permutations key-variants
                           #'(lambda (perm)
                               (print-message-variant ascii-vector perm))))
 
 ;;; ANSWER
 
-(defparameter *final-key* '(102 57 110 137 201 219 216 204 152 116 53 42 205 99 149 16 46 175 206 120 170 127 237 40 160 127 107 201 141 41 197 11 105 176 51 154 25 248 170 64 26 156 109 112 143 128 192 102 199 99 254 240 18 49 72 205 216 232 2 208 91 169 135 119 51 93 174 252 236 213 156 67 58 107 38 139 96 191 78 240 60 154 97))
+(defparameter *final-key* #(102 57 110 137 201 219 216 204 152 116 53 42 205 99 149 16 46 175 206 120 170 127 237 40 160 127 107 201 141 41 197 11 105 176 51 154 25 248 170 64 26 156 109 112 143 128 192 102 199 99 254 240 18 49 72 205 216 232 2 208 91 169 135 119 51 93 174 252 236 213 156 67 58 107 38 139 96 191 78 240 60 154 97))
