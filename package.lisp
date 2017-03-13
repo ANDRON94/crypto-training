@@ -27,6 +27,11 @@
            #:decompose-xored-letter
            #:decompose-xor-comparison
            #:decompose-xor-comparisons
+           ;; cl-openssl
+           #:make-aes-encryption-key
+           #:make-aes-decryption-key
+           #:aes-encrypt-block
+           #:aes-decrypt-block
            ;; Lesson1
            ;; TODO: think!
            ;; Lesson2
