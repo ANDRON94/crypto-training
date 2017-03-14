@@ -5,27 +5,27 @@
 
 ;;; INTERFACE
 
-(defun hex-string->ascii-vector (hex-string)
+(defun hex-string->byte-vector (hex-string)
   "Convert string of hex values to a vector
 of ASCII codes."
   (let ((len (length hex-string)))
-    (loop :for i :from 0 :below len :by 2
-       :with result = (make-array (/ len 2) :fill-pointer 0)
+    (loop :with result = (make-array (/ len 2) :fill-pointer 0)
+       :for i :from 0 :below len :by 2
        :do (vector-push (parse-integer hex-string :start i :end (+ i 2)
                                        :radix 16)
                         result)
        :finally (return result))))
 
-(defun hex-strings->ascii-vectors (messages)
+(defun hex-strings->byte-vectors (messages)
   "Convert several hex strings to a several vectors
 of ASCII codes."
-  (map 'vector #'hex-string->ascii-vector messages))
+  (map 'vector #'hex-string->byte-vector messages))
 
-(defun ascii-vector->char-vector (ascii-vector)
+(defun byte-vector->char-vector (byte-vector)
   "Convert vector of ASCII codes to a vectorS
 of characters."
   (map 'vector #'(lambda (ascii) (code-char ascii))
-       ascii-vector))
+       byte-vector))
 
 (defun xor-vectors (vector1 vector2)
   "Find xor of two vectors(element by element)."

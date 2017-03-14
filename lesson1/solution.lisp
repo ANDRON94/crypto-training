@@ -6,7 +6,7 @@
 ;;; INTERFACE
 
 (defun find-all-xor-key-variants (ascii-vectors pivot-id)
-  "Find all possible key variants for each ascii code
+  "Find all possible key variants for each encrypted ascii code
 from ASCII-VECTORS compare to vector with PIVOT-ID index."
   (let ((pivot-vector (aref ascii-vectors pivot-id))
         (comparisons (find-comparisons #'xor-vectors ascii-vectors pivot-id)))
@@ -14,13 +14,13 @@ from ASCII-VECTORS compare to vector with PIVOT-ID index."
                              pivot-vector)))
 
 (defun brute-force-attack (ascii-vectors)
-  "Find all possible key variants for ASCII-VECTORS(use a first vector
+  "Find all possible key variants for encrypted ASCII-VECTORS(use a first vector
  as pivot). However, a variants generated with other pivot vector will
 be the same."
   (find-all-xor-key-variants ascii-vectors 0))
 
 (defun filter-xor-key-variants (ascii-vectors key-variants filter)
-  "Reduce count of possible KEY-VARAINTS using a FILTER heuretic.
+  "Reduce count of possible KEY-VARAINTS using a FILTER heuristic.
 FILTER is a function of one argument(a sorted list of
 keys with corresponding weight values). Weight for key is
 calculating as sum of weights of characters where characters
@@ -97,7 +97,7 @@ of COLUMN-KEY and corresponding ascii value."
 (defun print-message-variant (ascii-vector key)
   "Print KEY and message(xor of ASCII-VECTOR and KEY
 element by element)."
-  (let ((msg (ascii-vector->char-vector (xor-vectors ascii-vector key))))
+  (let ((msg (byte-vector->char-vector (xor-vectors ascii-vector key))))
     (format t "Keys: ~a~%" key)
     (format t "Message: ~a~%~%" msg)
     msg))

@@ -17,9 +17,9 @@
            #:*punctuation-signs*
            #:*alphabet*
            ;; transformation
-           #:hex-string->ascii-vector
-           #:hex-strings->ascii-vectors
-           #:ascii-vector->char-vector
+           #:hex-string->byte-vector
+           #:hex-strings->byte-vectors
+           #:byte-vector->char-vector
            #:xor-vectors
            #:xor-vector-with-scalar
            #:xor-vectors-with-vector
