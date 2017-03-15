@@ -3,6 +3,28 @@
 
 (in-package #:learn-crypto-bitch)
 
+;;;; INTERFACE
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defparameter +aes-key-sizes+ '(16 24 32)
+    "List of all possible AES key sizes in octets(bytes) count.")
+
+  (defparameter +aes-block-size+ 16
+    "AES block size in octets(bytes) count.")
+
+  (defparameter +aes-round-key-size+ 16
+    "AES round key size in octets(bytes).")
+
+  (defparameter +aes-word32-count-per-round-key+ (/ +aes-round-key-size+ 4)
+    "Count of 32-bit words to hold round key.")
+
+  (defparameter +aes-max-rounds-count+ 14
+    "Maximum count of rounds defined by AES specification.")
+
+  (defparameter +aes-max-count-of-round-keys+ (1+ +aes-max-rounds-count+)
+    "Maximum count of round keys defined by AES
+specification(a separate 128-bit round key for each round plus one more)."))
+
 ;;;; IMPLEMENTATION
 
 ;;; define and load 'openssl' library before using
@@ -17,7 +39,8 @@
 ;;; define types
 
 (cffi:defcstruct aes-key
-  (rd-key (:pointer :uint32))
+  (rd-key :uint32 :count #.(* +aes-max-count-of-round-keys+
+                              +aes-word32-count-per-round-key+))
   (rounds :int))
 
 ;;; define functions
@@ -43,12 +66,6 @@
   (key (:pointer (:struct aes-key))))
 
 ;;;; INTERFACE
-
-(defparameter +aes-key-sizes+ '(16 24 32)
-  "List of all possible AES key sizes in octets(bytes) count.")
-
-(defparameter +aes-block-size+ 16
-  "AES block size in octets(bytes) count.")
 
 (defun make-aes-encryption-key (user-key)
   "Create AES encryption key using 'key schedule'
