@@ -16,7 +16,7 @@
 ;;; define types
 
 (cffi:defcstruct aes-key
-  (rd-key (:pointer :unsigned-int))
+  (rd-key (:pointer :uint32))
   (rounds :int))
 
 ;;; define functions
@@ -24,22 +24,22 @@
 (cffi:defcfun ("AES_set_encrypt_key" ffi-aes-set-encrypt-key) :int
   (user-key (:pointer :unsigned-char))
   (bits-count :int)
-  (key (:pointer :aes-key)))
+  (key (:pointer (:struct aes-key))))
 
 (cffi:defcfun ("AES_set_decrypt_key" ffi-aes-set-decrypt-key) :int
   (user-key (:pointer :unsigned-char))
   (bits-count :int)
-  (key (:pointer :aes-key)))
+  (key (:pointer (:struct aes-key))))
 
 (cffi:defcfun ("AES_encrypt" ffi-aes-encrypt) :void
   (in (:pointer :unsigned-char))
   (out (:pointer :unsigned-char))
-  (key (:pointer :aes-key)))
+  (key (:pointer (:struct aes-key))))
 
 (cffi:defcfun ("AES_decrypt" ffi-aes-decrypt) :void
   (in (:pointer :unsigned-char))
   (out (:pointer :unsigned-char))
-  (key (:pointer :aes-key)))
+  (key (:pointer (:struct aes-key))))
 
 ;;;; INTERFACE
 
