@@ -50,30 +50,30 @@ is a corresponding column from ASCII-VECTORS."
 
 ;;; IMPLEMENTATION
 
-(defparameter *pivot-weight* 3)
+(defparameter +pivot-weight+ 3)
 
 (defun letter-or-space-p (code)
   "Check whether char code is a space
 or letter."
   (let ((char (code-char code)))
-    (or (find char *english-letters*)
+    (or (find char +english-letters+)
         (char= char #\Space))))
 
 (defun digitp (code)
   "Check whether char code is a digit."
-  (find (code-char code) *digits*))
+  (find (code-char code) +digits+))
 
 (defun punctuationp (code)
   "Check wheter char code is a punctuation sign."
-  (find (code-char code) *punctuation-signs*))
+  (find (code-char code) +punctuation-signs+))
 
 (defun char-weight (code)
   "Calculate weight of char code based on frequency
 of different groups of characters(letter, digit, punctuation).
 More frequency - more weight."
-  (cond ((letter-or-space-p code) *pivot-weight*)
-        ((digitp code) (- *pivot-weight* 1))
-        ((punctuationp code) (- *pivot-weight* 2))
+  (cond ((letter-or-space-p code) +pivot-weight+)
+        ((digitp code) (- +pivot-weight+ 1))
+        ((punctuationp code) (- +pivot-weight+ 2))
         (t 0)))
 
 (defun column-weight (ascii-vectors column-id column-key)

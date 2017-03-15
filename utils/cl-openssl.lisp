@@ -43,11 +43,11 @@
 
 ;;;; INTERFACE
 
-(defparameter +AES-KEY-SIZES+ '(16 24 32)
+(defparameter +aes-key-sizes+ '(16 24 32)
   "List of all possible AES key sizes in octets(bytes) count.")
 
-(defparameter +AES-BLOCK-SIZE+ 16
-  "AES block size in octets(bytes) count")
+(defparameter +aes-block-size+ 16
+  "AES block size in octets(bytes) count.")
 
 (defun make-aes-encryption-key (user-key)
   "Create AES encryption key using 'key schedule'

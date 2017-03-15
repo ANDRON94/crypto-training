@@ -19,15 +19,15 @@
      :collect (code-char i) :into result
      :finally (return `(list ,@result))))
 
-(defparameter *english-letters* (english-letters))
+(defparameter +english-letters+ (english-letters))
 
-(defparameter *digits* (digits))
+(defparameter +digits+ (digits))
 
-(defparameter *punctuation-signs* '(#\Space #\. #\, #\? #\! #\:
+(defparameter +punctuation-signs+ '(#\Space #\. #\, #\? #\! #\:
                                     #\; #\' #\" #\( #\) #\[ #\] #\{ #\}
                                     #\- #\/))
 
-(defparameter *alphabet* (append *english-letters* *digits*
-                                 *punctuation-signs*))
+(defparameter +alphabet+ (append +english-letters+ +digits+
+                                 +punctuation-signs+))
 
 ;;; IMPLEMENTATION

@@ -10,9 +10,9 @@
 X xor Y = LETTER-CODE, for any Y."
   (loop :with result = (make-array 0 :fill-pointer 0
                                    :adjustable t)
-     :for x :in *alphabet*
+     :for x :in +alphabet+
      :for x-code = (char-code x)
-     :when (loop :for y :in *alphabet*
+     :when (loop :for y :in +alphabet+
               :for y-code = (char-code y)
               :when (= letter-code (logxor x-code y-code))
               :return t)

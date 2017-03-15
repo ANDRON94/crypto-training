@@ -12,10 +12,10 @@
            ;; helper-data
            #:english-letters
            #:digits
-           #:*english-letters*
-           #:*digits*
-           #:*punctuation-signs*
-           #:*alphabet*
+           #:+english-letters+
+           #:+digits+
+           #:+punctuation-signs+
+           #:+alphabet+
            ;; transformation
            #:hex-string->byte-vector
            #:hex-strings->byte-vectors
