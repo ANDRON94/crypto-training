@@ -8,7 +8,8 @@
 ;;; define and load 'openssl' library before using
 
 (cffi:define-foreign-library openssl
-  (:unix (:or "libssl.so.1.0.2"))
+  (:unix (:or "libssl.so.1.0.0"
+              "libssl.so.1.0.2"))
   (t (:default "libssl3")))
 
 (cffi:use-foreign-library openssl)
