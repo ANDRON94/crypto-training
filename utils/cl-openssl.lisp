@@ -71,8 +71,17 @@ specification(a separate 128-bit round key for each round plus one more)."))
   "Create AES encryption key using 'key schedule'
 procedure based on USER-KEY.
 USER-KEY is a vector of bytes"
-  ;; TODO!
-  nil)
+  (let ((key-size (length user-key)))
+    (if (find key-size +aes-key-sizes+)
+        (let ((key (cffi:foreign-alloc '(:struct aes-key))))
+          (cffi:with-foreign-object (in-key :uchar key-size)
+            (loop :for i :from 0 :below key-size
+               :for curr = (aref user-key i)
+               :do (setf (cffi:mem-aref in-key :uchar i) curr))
+            (ffi-aes-set-encrypt-key in-key (* key-size 8) key)
+            (cffi:foreign-slot-value key '(:struct aes-key) 'rounds)))
+        (error "Wrong user-key size ~d! ~
+Should be equal to 16, 24 or 32!" key-size))))
 
 (defun make-aes-decryption-key (user-key)
   ;; TODO!
