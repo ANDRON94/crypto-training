@@ -10,7 +10,7 @@
 of ASCII codes."
   (let ((len (length hex-string)))
     (loop :with result = (make-array (/ len 2) :fill-pointer 0
-                                     :element-type (unsigned-byte 8))
+                                     :element-type '(unsigned-byte 8))
        :for i :from 0 :below len :by 2
        :do (vector-push (parse-integer hex-string :start i :end (+ i 2)
                                        :radix 16)
