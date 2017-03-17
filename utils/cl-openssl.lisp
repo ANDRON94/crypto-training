@@ -45,6 +45,49 @@ specification(a separate 128-bit round key for each round plus one more).")
                               +aes-word32-count-per-round-key+))
   (rounds :int))
 
+(cffi:define-foreign-type byte-vector-type ()
+  ((count :reader byte-vector-count :initarg :count))
+  (:actual-type :pointer))
+
+(cffi:define-parse-method byte-vector (&key (count 1))
+  (make-instance 'byte-vector-type :count count))
+
+(defmethod cffi:translate-to-foreign (vector (type byte-vector-type))
+  (let* ((count (byte-vector-count type))
+         (real-count (if vector (length vector) count)))
+    (cffi:foreign-alloc :uchar :count real-count
+                        :initial-contents vector)))
+
+(defmethod cffi:translate-from-foreign (pointer (type byte-vector-type))
+  (let ((count (byte-vector-count type)))
+    (loop :with res = (make-array count :fill-pointer 0)
+       :for i :from 0 :below count
+       :do (vector-push (cffi:mem-aref pointer :uchar i) res)
+       :finally (return res))))
+
+(defmethod cffi:free-translated-object (pointer (type byte-vector-type) param)
+  (declare (ignore param))
+  (cffi:foreign-free pointer))
+
+(defmethod cffi:expand-to-foreign-dyn (value var body (type byte-vector-type))
+  (let ((count (byte-vector-count type))
+        (real-count (gensym)))
+    `(let* ((,real-count (if ,value (length ,value) ,count))
+            (,var (cffi:foreign-alloc :uchar :count ,real-count
+                                      :initial-contents ,value)))
+       (unwind-protect
+            (progn ,@body)
+         (cffi:foreign-free ,var)))))
+
+(defmethod cffi:expand-from-foreign (form (type byte-vector-type))
+  (let ((count (byte-vector-count type))
+        (i (gensym)) (value (gensym)) (res (gensym)))
+    `(loop :with ,value = ,form :and
+        :with ,res = (make-array ,count :fill-pointer 0)
+        :for ,i :from 0 :below ,count
+        :do (vector-push (cffi:mem-aref ,value :uchar ,i) ,res)
+        :finally (return ,res))))
+
 ;;; define functions
 
 (cffi:defcfun ("AES_set_encrypt_key" ffi-aes-set-encrypt-key) :int
