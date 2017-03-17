@@ -91,12 +91,12 @@ specification(a separate 128-bit round key for each round plus one more).")
 ;;; define functions
 
 (cffi:defcfun ("AES_set_encrypt_key" ffi-aes-set-encrypt-key) :int
-  (user-key (:pointer :unsigned-char))
+  (user-key byte-vector)
   (bits-count :int)
   (key (:pointer (:struct aes-key))))
 
 (cffi:defcfun ("AES_set_decrypt_key" ffi-aes-set-decrypt-key) :int
-  (user-key (:pointer :unsigned-char))
+  (user-key byte-vector)
   (bits-count :int)
   (key (:pointer (:struct aes-key))))
 
@@ -123,19 +123,14 @@ Returns generated AES-KEY."
   (let* ((key-size (length user-key))
          (key-size-bits (* key-size +bits-per-byte+)))
     (if (find key-size +aes-key-sizes+)
-        (cffi:with-foreign-object (ffi-user-key :uchar key-size)
-          ;; init ffi-user-key with user-key values
-          (loop :for i :from 0 :below key-size
-             :for curr = (aref user-key i)
-             :do (setf (cffi:mem-aref ffi-user-key :uchar i) curr))
-          (ecase action
-            (:encrypt (ffi-aes-set-encrypt-key ffi-user-key
-                                               key-size-bits
-                                               aes-key-mem))
-            (:decrypt (ffi-aes-set-decrypt-key ffi-user-key
-                                               key-size-bits
-                                               aes-key-mem)))
-          aes-key-mem)
+        (progn (ecase action
+                 (:encrypt (ffi-aes-set-encrypt-key user-key
+                                                    key-size-bits
+                                                    aes-key-mem))
+                 (:decrypt (ffi-aes-set-decrypt-key user-key
+                                                    key-size-bits
+                                                    aes-key-mem)))
+               aes-key-mem)
         (error "Wrong user-key size ~d! ~
 Should be equal to 16, 24 or 32!" key-size))))
 
