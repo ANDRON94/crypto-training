@@ -28,10 +28,15 @@
            #:decompose-xor-comparison
            #:decompose-xor-comparisons
            ;; cl-openssl
-           #:make-aes-encryption-key
-           #:make-aes-decryption-key
-           #:aes-encrypt-block
-           #:aes-decrypt-block
+           #:+aes-key-sizes+
+           #:+aes-block-size+
+           #:+aes-round-key-size+
+           #:+aes-word32-count-per-round-key+
+           #:+aes-max-rounds-count+
+           #:+aes-max-count-of-round-keys+
+           #:+bits-per-byte+
+           #:aes-set-key
+           #:aes-handle-block
            ;; Lesson1
            ;; TODO: think!
            ;; Lesson2
