@@ -70,9 +70,10 @@ specification(a separate 128-bit round key for each round plus one more).")
 ;;;; INTERFACE
 
 (defun aes-set-key (user-key aes-key-mem &key (action :encrypt))
-  "Create AES internal(per each round) key using a USER-KEY value
-and allocated memory AES-KEY-MEM enough to hold AES-KEY structure.
-ACTION allows to choose which key should be created:
+  "Create AES internal(per each round) key using a USER-KEY
+value(vector of bytes) and allocated memory AES-KEY-MEM enough
+to hold AES-KEY structure. ACTION allows to choose which
+key should be created:
 1) encryption(:encrypt, default mode);
 2) decryption(:decrypt).
 Returns generated AES-KEY."
@@ -95,12 +96,28 @@ Returns generated AES-KEY."
         (error "Wrong user-key size ~d! ~
 Should be equal to 16, 24 or 32!" key-size))))
 
-(defun aes-encrypt-block (plain-block key)
-  ;; TODO!
-  nil)
-
-(defun aes-decrypt-block (cipher-block key)
-  ;; TODO!
-  nil)
+(defun aes-handle-block (block key &key (action :encrypt))
+  "Handle 128-bit(16-byte) BLOCK(vector of bytes) using
+an internal(per each round) KEY. ACTION allows to choose
+which mode should be initiated:
+1) encryption(:encrypt, default mode);
+2) decryption(:decrypt).
+Returns handled BLOCK."
+  (let ((block-size (length block)))
+    (if (= block-size +aes-block-size+)
+        (cffi:with-foreign-object (ffi-block :uchar block-size)
+          ;; init ffi-block with block values
+          (loop :for i :from 0 :below block-size
+             :for curr = (aref block i)
+             :do (setf (cffi:mem-aref ffi-block :uchar i) curr))
+          (ecase action
+            (:encrypt (ffi-aes-encrypt ffi-block ffi-block key))
+            (:decrypt (ffi-aes-decrypt ffi-block ffi-block key)))
+          ;; convert result from C array to Lisp vector
+          (loop :with result = (make-array block-size :fill-pointer 0)
+             :for i :from 0 :below block-size
+             :do (vector-push (cffi:mem-aref ffi-block :uchar i) result)
+             :finally (return result)))
+        (error "Wrong block size ~d! Should be equal to 16!" block-size))))
 
 ;;;; IMPLEMENTATION
