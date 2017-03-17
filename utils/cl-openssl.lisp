@@ -5,25 +5,27 @@
 
 ;;;; INTERFACE
 
-(eval-when (:compile-toplevel :load-toplevel :execute)
-  (defparameter +aes-key-sizes+ '(16 24 32)
-    "List of all possible AES key sizes in octets(bytes) count.")
+(defparameter +aes-key-sizes+ '(16 24 32)
+  "List of all possible AES key sizes in octets(bytes) count.")
 
-  (defparameter +aes-block-size+ 16
-    "AES block size in octets(bytes) count.")
+(defconstant +aes-block-size+ 16
+  "AES block size in octets(bytes) count.")
 
-  (defparameter +aes-round-key-size+ 16
-    "AES round key size in octets(bytes).")
+(defconstant +aes-round-key-size+ 16
+  "AES round key size in octets(bytes).")
 
-  (defparameter +aes-word32-count-per-round-key+ (/ +aes-round-key-size+ 4)
-    "Count of 32-bit words to hold round key.")
+(defconstant +aes-word32-count-per-round-key+ (/ +aes-round-key-size+ 4)
+  "Count of 32-bit words to hold round key.")
 
-  (defparameter +aes-max-rounds-count+ 14
-    "Maximum count of rounds defined by AES specification.")
+(defconstant +aes-max-rounds-count+ 14
+  "Maximum count of rounds defined by AES specification.")
 
-  (defparameter +aes-max-count-of-round-keys+ (1+ +aes-max-rounds-count+)
-    "Maximum count of round keys defined by AES
-specification(a separate 128-bit round key for each round plus one more)."))
+(defconstant +aes-max-count-of-round-keys+ (1+ +aes-max-rounds-count+)
+  "Maximum count of round keys defined by AES
+specification(a separate 128-bit round key for each round plus one more).")
+
+(defconstant +bits-per-byte+ 8
+  "Count of bits per byte(octet).")
 
 ;;;; IMPLEMENTATION
 
@@ -67,29 +69,31 @@ specification(a separate 128-bit round key for each round plus one more)."))
 
 ;;;; INTERFACE
 
-(defun make-aes-encryption-key (user-key)
-  "Create AES encryption key using 'key schedule'
-procedure based on USER-KEY.
-USER-KEY is a vector of bytes"
-  (let ((key-size (length user-key)))
+(defun aes-set-key (user-key aes-key-mem &key (action :encrypt))
+  "Create AES internal(per each round) key using a USER-KEY value
+and allocated memory AES-KEY-MEM enough to hold AES-KEY structure.
+ACTION allows to choose which key should be created:
+1) encryption(:encrypt, default mode);
+2) decryption(:decrypt).
+Returns generated AES-KEY."
+  (let* ((key-size (length user-key))
+         (key-size-bits (* key-size +bits-per-byte+)))
     (if (find key-size +aes-key-sizes+)
-        (let ((key (cffi:foreign-alloc '(:struct aes-key))))
-          (cffi:with-foreign-object (in-key :uchar key-size)
-            (loop :for i :from 0 :below key-size
-               :for curr = (aref user-key i)
-               :do (setf (cffi:mem-aref in-key :uchar i) curr))
-            (ffi-aes-set-encrypt-key in-key (* key-size 8) key)
-            (cffi:foreign-slot-value key '(:struct aes-key) 'rounds)))
+        (cffi:with-foreign-object (ffi-user-key :uchar key-size)
+          ;; init ffi-user-key with user-key values
+          (loop :for i :from 0 :below key-size
+             :for curr = (aref user-key i)
+             :do (setf (cffi:mem-aref ffi-user-key :uchar i) curr))
+          (ecase action
+            (:encrypt (ffi-aes-set-encrypt-key ffi-user-key
+                                               key-size-bits
+                                               aes-key-mem))
+            (:decrypt (ffi-aes-set-decrypt-key ffi-user-key
+                                               key-size-bits
+                                               aes-key-mem)))
+          aes-key-mem)
         (error "Wrong user-key size ~d! ~
 Should be equal to 16, 24 or 32!" key-size))))
-
-(defun make-aes-decryption-key (user-key)
-  ;; TODO!
-  nil)
-
-(defun release-aes-key (key)
-  ;; TODO!
-  nil)
 
 (defun aes-encrypt-block (plain-block key)
   ;; TODO!
