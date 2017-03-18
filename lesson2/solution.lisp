@@ -5,7 +5,7 @@
 
 ;;; INTERFACE
 
-(defgeneric aes-encrypt (input mode action)
+(defgeneric aes-encrypt (input init-vector key mode action)
   (:documentation "Make encryption/decryption of INPUT byte vector
 using a AES block cipher.
 MODE specify in which mode encryption will be done:
@@ -17,15 +17,51 @@ ACTION specify which process will be executed:
 
 ;;; IMPLEMENTATION
 
-(defmethod aes-encrypt (input (mode (eql :cbc)) (action (eql :encrypt)))
+(defmethod aes-encrypt (input init-vector key (mode (eql :cbc))
+                        (action (eql :encrypt)))
   :cbc-encrypt)
 
-(defmethod aes-encrypt (input (mode (eql :cbc)) (action (eql :decrypt)))
-  :cbc-decrypt)
+(defmethod aes-encrypt (input init-vector key (mode (eql :cbc))
+                        (action (eql :decrypt)))
+  (cffi:with-foreign-object (aes-key-mem '(:struct aes-key))
+    (let ((en-key (aes-set-key key aes-key-mem :action :decrypt)))
+      (loop :with result = (vector)
+         :with chain = init-vector
+         :for i :from 0 :below (length input) :by +aes-block-size+
+         :for curr-input = (subseq input i (+ i +aes-block-size+))
+         :for curr-encrypt = (aes-handle-block curr-input en-key
+                                               :action :decrypt)
+         :do (setf result (concatenate 'vector result
+                                       (xor-vectors chain curr-encrypt)))
+             (setf chain curr-input)
+         :finally (return result)))))
 
-(defmethod aes-encrypt (input (mode (eql :ctr)) (action (eql :encrypt)))
-  :ctr-encrypt)
+(defmethod aes-encrypt (input init-vector key (mode (eql :ctr)) action)
+  (declare (ignore action))
+  (cffi:with-foreign-object (aes-key-mem '(:struct aes-key))
+    (let ((en-key (aes-set-key key aes-key-mem :action :encrypt))
+          (len (length input)))
+      (loop :with result = (vector)
+         :for i :from 0 :below (ceiling len +aes-block-size+)
+         :for start = (* i +aes-block-size+)
+         :for end = (min (* (1+ i) +aes-block-size+) len)
+         :for curr-input = (subseq input start end)
+         :for curr-iv = (inc-byte-vector init-vector i)
+         :for curr-encrypt = (aes-handle-block curr-iv en-key :action :encrypt)
+         :do (setf result (concatenate 'vector result
+                                       (xor-vectors curr-input curr-encrypt)))
+         :finally (return result)))))
 
-(defmethod aes-encrypt (input (mode (eql :ctr)) (action (eql :decrypt)))
-  :ctr-decrypt)
-
+(defun inc-byte-vector (vector num)
+  (let ((byte-vector (copy-seq vector)))
+    (loop :with inc = num
+     :for i :from (1- (length byte-vector)) :downto 0
+     :for curr = (aref byte-vector i)
+     :for pre-val = (+ curr inc)
+     :if (>= pre-val 256)
+       :do (setf (aref byte-vector i) (mod pre-val 256))
+           (setf inc (truncate pre-val 256))
+     :else
+       :do (setf (aref byte-vector i) pre-val) :and
+       :return byte-vector
+     :finally (return byte-vector))))
