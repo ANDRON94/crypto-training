@@ -19,7 +19,24 @@ ACTION specify which process will be executed:
 
 (defmethod aes-encrypt (input init-vector key (mode (eql :cbc))
                         (action (eql :encrypt)))
-  :cbc-encrypt)
+  (cffi:with-foreign-object (aes-key-mem '(:struct aes-key))
+    (let ((en-key (aes-set-key key aes-key-mem))
+          (len (length input)))
+      (loop :with result = (vector)
+         :with chain = init-vector
+         :for i :from 0 :below (truncate len +aes-block-size+)
+         :for start = (* i +aes-block-size+)
+         :for end = (* (1+ i) +aes-block-size+)
+         :for curr-input = (subseq input start end)
+         :for curr-xored = (xor-vectors curr-input chain)
+         :for curr-encrypt = (aes-handle-block curr-xored en-key)
+         :do (setf result (concatenate 'vector result curr-encrypt))
+             (setf chain curr-encrypt)
+         :finally (let* ((padding (make-padding-block input end))
+                         (last-xored (xor-vectors padding chain))
+                         (last-encrypt (aes-handle-block last-xored en-key)))
+                    (setf result (concatenate 'vector result last-encrypt))
+                    (return result))))))
 
 (defmethod aes-encrypt (input init-vector key (mode (eql :cbc))
                         (action (eql :decrypt)))
@@ -65,3 +82,10 @@ ACTION specify which process will be executed:
        :do (setf (aref byte-vector i) pre-val) :and
        :return byte-vector
      :finally (return byte-vector))))
+
+(defun make-padding-block (input block-end)
+  (let* ((len (length input))
+         (last-input (subseq input block-end len))
+         (pad-len (- +aes-block-size+ (- len block-end))))
+    (concatenate 'vector last-input
+                 (make-array pad-len :initial-element pad-len))))
